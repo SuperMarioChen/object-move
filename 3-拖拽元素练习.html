@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title></title>
+		<style>
+			div {
+				width: 300px;
+				height: 300px;
+				background: red;
+				position: absolute;
+				left: 0;
+				top: 0;
+			}
+			#box2 {
+				background: green;
+				top: 300px;
+			}
+		</style>
+		<script src="./jquery-3.3.1.js"></script>
+		<script>
+			/*
+				$().on('事件名、自定义的事件名'，function)
+				$().trigger('自定义的事件名')
+				$().off('自定义的事件名')
+			*/
+		</script>
+
+	</head>
+
+	<body>
+		<div id="box1">div1</div>
+		<div id="box2">div2</div>
+		<script>
+			function Drag(id){
+				this.dragElement = document.querySelector(id)	
+				this.init()
+			}
+			Drag.prototype.init=function(){
+				this.dragElement.addEventListener('mousedown',this.downFn.bind(this))//downFn不用加括号mousedown会执行的
+			}
+			Drag.prototype.downFn=function(e){
+				this.disX = e.clientX - this.dragElement.offsetLeft;//clientX鼠标相对于可视区域x
+				this.disY = e.clientY - this.dragElement.offsetTop;//el.offsetLeft相对于定位
+				this.moveFn2 = this.moveFn.bind(this);
+				this.moveUp2 = this.upFn.bind(this);
+				document.addEventListener('mousemove',this.moveFn2)
+				document.addEventListener('mouseup',this.moveUp2)
+			}
+			Drag.prototype.moveFn=function(e){
+				this.l = e.clientX - this.disX
+				this.t = e.clientY - this.disY
+				$(this.dragElement).trigger('c-move1')
+				$(this.dragElement).trigger('c-move')
+				//放在这是要限制的
+				this.dragElement.style.left = this.l + 'px'
+				this.dragElement.style.top = this.t + 'px'
+			}
+			Drag.prototype.upFn = function(){
+				document.removeEventListener('mousemove',this.moveFn2)
+				document.removeEventListener('mouseup',this.moveUp2)
+			}
+			var b1 = new Drag('#box1')
+			$('#box1').on('c-move',function (){
+				console.log(1);	
+				if(b1.l < 0) b1.l = 0;
+				if(b1.t < 0) b1.t = 0;
+			})
+			$('#box1').on('c-move1',function (){
+				console.log('c-move1');	
+			})
+			var b2 = new Drag('#box2')
+		</script>
+
+	</body>
+</html>
